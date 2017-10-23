@@ -2,22 +2,13 @@
 import argparse
 import base64
 import json
-
-import csv
-import cv2
-
-import tensorflow as tf
-
-from scipy.misc import imread, imresize
-from sklearn.utils import shuffle
-from os import listdir
-from os.path import join
-
-import numpy as np
 import socketio
 import eventlet
 import eventlet.wsgi
 import time
+
+import numpy as np
+
 from PIL import Image
 from PIL import ImageOps
 from flask import Flask, render_template
