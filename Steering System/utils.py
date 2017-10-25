@@ -6,7 +6,7 @@ import numpy as np
 from scipy.misc import imread, imresize
 from sklearn.utils import shuffle
 
-def resize(imgs, shape=(32, 16, 3)):
+def resize(imgs, shape=(64, 64, 3)):
     height, width, channels = shape
     imgs_resized = np.empty([len(imgs), height, width, channels])
     for i, img in enumerate(imgs):
@@ -17,9 +17,9 @@ def resize(imgs, shape=(32, 16, 3)):
 def rgb2gray(imgs):
     #return np.mean(imgs, axis=3, keepdims=True)
     return imgs
-
+    
 def normalize(imgs):
-    return imgs / (255.0 / 2) - 1
+    return imgs / (255.0 / 2.0) - 1
 
 def preprocess(imgs):
     imgs_processed = resize(imgs)

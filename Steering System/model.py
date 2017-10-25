@@ -7,7 +7,7 @@ from os import listdir
 from os.path import join
 
 from keras.models import Sequential
-from keras.layers import Conv2D, ConvLSTM2D, Dense, MaxPooling2D, Dropout, Flatten
+from keras.layers import Conv2D, ConvLSTM2D, Dense, MaxPooling2D, Dropout, Flatten, Lambda
 from keras.optimizers import Adam
 
 from utils import *
@@ -34,9 +34,11 @@ np.random.shuffle(data)
 split_i = int(len(data) * 0.9)
 
 X_train, y_train = list(zip(*data[:split_i]))
+
 X_val, y_val = list(zip(*data[split_i:]))
 
 X_train, y_train = np.array(X_train), np.array(y_train)
+
 X_val, y_val = np.array(X_val), np.array(y_val)
 
 model = Sequential()
@@ -60,26 +62,50 @@ model = Sequential()
 
 ########### Nvidia ARCHITECTURE ###########
 
-model.add(Conv2D(3, 5, 5, subsample=(2, 2), border_mode='same', input_shape=(32,16,3), activation='relu'))
-model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
+model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', activation='relu', input_shape=(64,64,3)))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
 model.add(Conv2D(36, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
-model.add(Conv2D(48, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(64, 3, 3, border_mode='same', activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+model.add(Conv2D(48, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
 model.add(Flatten())
+
 model.add(Dense(1164, activation='relu'))
+#model.add(Dropout(0.5))
+
 model.add(Dense(100, activation='relu'))
+#model.add(Dropout(0.5))
+
 model.add(Dense(50, activation='relu'))
+#model.add(Dropout(0.5))
+
 model.add(Dense(10, activation='relu'))
+
 model.add(Dense(1, name='output', activation='tanh'))
 
 ###########################################
 
+train = gen_batches(X_train, y_train, 128)
+valid = gen_batches(X_val, y_val, 128)
+
 model.compile(optimizer=Adam(lr=1e-4), loss='mse')
-history = model.fit_generator(gen_batches(X_train, y_train, 128),
-                                len(X_train),
-                                5,
-                                validation_data=gen_batches(X_val, y_val, 128),
-                                nb_val_samples=len(X_val))
+history = model.fit_generator(train,
+                            samples_per_epoch=20032,
+                            nb_epoch=8,
+                            validation_data=valid,
+                            nb_val_samples=len(X_val),
+                            verbose=1)
+
+#model.summary()
 
 model.save('model.h5')
 
