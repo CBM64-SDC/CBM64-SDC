@@ -102,7 +102,7 @@ history = model.fit_generator(train,
                             samples_per_epoch=20032,
                             nb_epoch=8,
                             validation_data=valid,
-                            nb_val_samples=len(X_val),
+                            nb_val_samples=6400,
                             verbose=1)
 
 #model.summary()

@@ -17,7 +17,7 @@ from io import BytesIO
 from keras.models import model_from_json
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
 
-from utils import preprocess, resize, rgb2gray, normalize
+from utils import *
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -43,7 +43,7 @@ def telemetry(sid, data):
 
     steering_angle = float(model.predict(img_processed, batch_size=1))
     # The driving model currently just outputs a constant throttle. Feel free to edit this.
-    throttle = 0.5
+    throttle = 0.2
     print(steering_angle, throttle)
     send_control(steering_angle, throttle)
 
