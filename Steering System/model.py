@@ -13,8 +13,7 @@ from keras.optimizers import Adam
 from utils import *
 
 base_dir = '/home/lacosa/Downloads/SDCGPKHARA/data/IMG/'
-
-### '/Users/mohammedamarnah/Desktop/SDCProject/data/IMG/'
+base_dir = '/Users/mohammedamarnah/Desktop/SDCProject/data/IMG/'
 
 img_files = listdir('../../data/IMG/')
 
