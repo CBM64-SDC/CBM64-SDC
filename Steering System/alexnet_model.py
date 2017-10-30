@@ -9,23 +9,14 @@ from os.path import join
 from keras.models import Sequential
 from keras.layers import Conv2D, ConvLSTM2D, Dense, MaxPooling2D, Dropout, Flatten, Lambda
 from keras.layers.convolutional import Convolution2D
-#from keras.layers.pooling import MaxPooling2D
+from keras.layers.pooling import MaxPooling2D
 from keras.optimizers import Adam
 
 from utils import *
 
-###########################
-
-from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation, Flatten
-from keras.layers.convolutional import Convolution2D, MaxPooling2D
-from keras.layers.normalization import BatchNormalization
-
-###########################
-
 base_dir = '/home/lacosa/Downloads/SDCGPKHARA/data/IMG/'
 
-### '/Users/mohammedamarnah/Desktop/SDCProject/data/IMG/'
+base_dir = '/Users/mohammedamarnah/Desktop/SDCProject/data/IMG/'
 
 img_files = listdir('../../data/IMG/')
 
@@ -58,16 +49,10 @@ X_val, y_val = np.array(X_val), np.array(y_val)
 
 model = Sequential()
 
-#model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', activation='relu', input_shape=(64,64,3)))
-
 model.add(Conv2D(64, 11, 11, border_mode='same', activation='relu', input_shape=(64,64,3)))
-#model.add(BatchNormalization((64,226,226)))
-#model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Conv2D(128, 7, 7, border_mode='same', activation='relu'))
-#model.add(BatchNormalization((128,115,115)))
-#model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Conv2D(192, 3, 3, border_mode='same', activation='relu'))
@@ -81,29 +66,28 @@ model.add(Conv2D(256, 3, 3, border_mode='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten())
-#model.add(Dense(12*12*256, 4096))
-#model.add(BatchNormalization(4096))
-model.add(Activation('relu'))
-#model.add(Dense(4096, 4096, init='normal'))
-#model.add(BatchNormalization(4096))
-model.add(Activation('relu'))
-#model.add(Dense(4096, 1000, init='normal'))
-#model.add(BatchNormalization(1000))
-model.add(Activation('softmax'))
+
+model.add(Dense(12*12*256, activation='relu'))
+
+model.add(Dense(4096, activation='relu'))
+
+model.add(Dense(4096, activation='relu'))
+
+model.add(Dense(1, activation='tanh'))
 
 ###########################################
 
-train = gen_batches(X_train, y_train, 4096)
-valid = gen_batches(X_val, y_val, 4096)
+train = gen_batches(X_train, y_train, 64)
+valid = gen_batches(X_val, y_val, 64)
 
-model.compile(optimizer=Adam(lr=0.01), loss='mse')
+model.compile(optimizer=Adam(lr=1e-4), loss='mse')
 history = model.fit_generator(train,
                             samples_per_epoch=20032,
-                            nb_epoch=8,
+                            nb_epoch=5,
                             validation_data=valid,
                             nb_val_samples=6400)
 
-#model.summary()
+model.summary()
 
 model.save('model.h5')
 
