@@ -1,4 +1,5 @@
 import csv
+import models
 
 import numpy as np
 
@@ -10,7 +11,6 @@ from keras.models import Sequential
 from keras.optimizers import Adam
 
 from utils import *
-from models import *
 
 ##################### Pre-processing - 1 ###########################
 base_dir = '/home/lacosa/Downloads/SDCGPKHARA/data/IMG/'
@@ -48,7 +48,7 @@ X_val, y_val = np.array(X_val), np.array(y_val)
 ####################### Model Training #############################
 model = Sequential()
 
-nvidia(model)
+models.nvidia(model)
 
 model.summary()
 
