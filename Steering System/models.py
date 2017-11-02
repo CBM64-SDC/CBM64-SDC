@@ -1,31 +1,31 @@
 from keras.layers import Conv2D, ConvLSTM2D, Dense, MaxPooling2D, Dropout, Flatten, Lambda
 
 def nvidia(model):
-	model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', activation='relu', input_shape=(64,64,1)))
+	model.add(Conv2D(36, 5, 5, subsample=(2, 2), border_mode='valid', activation='relu', input_shape=(64,64,1)))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-	model.add(Conv2D(36, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
+	model.add(Conv2D(48, 5, 5, subsample=(2, 2), border_mode='valid', activation='relu'))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-	model.add(Conv2D(48, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
+	model.add(Conv2D(64, 5, 5, subsample=(2, 2), border_mode='valid', activation='relu'))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
+	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='valid', activation='relu'))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
+	model.add(Conv2D(128, 3, 3, subsample=(1, 1), border_mode='valid', activation='relu'))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
 	model.add(Flatten())
 
 	model.add(Dense(1164, activation='relu'))
-	#model.add(Dropout(0.5))
+	model.add(Dropout(0.5))
 
 	model.add(Dense(100, activation='relu'))
-	#model.add(Dropout(0.5))
+	model.add(Dropout(0.5))
 
 	model.add(Dense(50, activation='relu'))
-	#model.add(Dropout(0.5))
+	model.add(Dropout(0.5))
 
 	model.add(Dense(10, activation='relu'))
 

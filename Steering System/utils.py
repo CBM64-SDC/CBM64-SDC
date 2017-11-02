@@ -18,7 +18,9 @@ def rgb2gray(imgs):
     #return imgs
     
 def normalize(imgs):
-    return imgs / (255.0 / 2.0) - 1
+    imgs /= 255
+    imgs -= 0.5
+    return imgs
 
 def preprocess(imgs):
     imgs_processed = resize(imgs)
