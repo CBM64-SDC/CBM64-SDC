@@ -14,8 +14,8 @@ def resize(imgs, shape=(64, 64, 3)):
     return imgs_resized
 
 def rgb2gray(imgs):
-    #return np.mean(imgs, axis=3, keepdims=True)
-    return imgs
+    return np.mean(imgs, axis=3, keepdims=True)
+    #return imgs
     
 def normalize(imgs):
     return imgs / (255.0 / 2.0) - 1
