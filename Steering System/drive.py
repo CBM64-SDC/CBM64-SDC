@@ -28,22 +28,28 @@ prev_image_array = None
 def telemetry(sid, data):
     # The current steering angle of the car
     steering_angle = data["steering_angle"]
+    
     # The current throttle of the car
     throttle = data["throttle"]
+    
     # The current speed of the car
     speed = data["speed"]
+    speed = float(speed)
+
     # The current image from the center camera of the car
     imgString = data["image"]
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
-    transformed_image_array = image_array[None, :, :, :]
-    # This model currently assumes that the features of the model are just the images. Feel free to change this.
+    
+    image_array = preprocess(image_array)
 
-    img_processed = preprocess(transformed_image_array)
+    transformed_image_array = image_array[None, :, :, :]
 
     steering_angle = float(model.predict(img_processed, batch_size=1))
+    
     # The driving model currently just outputs a constant throttle. Feel free to edit this.
-    throttle = 0.2
+    throttle = (15 - speed) * 0.5
+
     print(steering_angle, throttle)
     send_control(steering_angle, throttle)
 

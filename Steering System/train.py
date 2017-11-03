@@ -1,70 +1,52 @@
 import csv
 import models
+import utils
 
 import numpy as np
 
+import pandas as pd
+pd.options.display.float_format = '${:,.10f}'.format
+
 from sklearn.utils import shuffle
-from os import listdir
-from os.path import join
 
 from keras.models import Sequential
-from keras.optimizers import Adam
 
-from utils import *
+###### SOME CONSTANTS ######
+SPLIT = 0.7
+BATCH_SIZE = 32
+EPOCHS = 8
+VAL_SAMPLES = 30000
+SAMPLES_PER_EPOCH = (20000//BATCH_SIZE)*BATCH_SIZE
+############################
 
-##################### Pre-processing - 1 ###########################
-base_dir = '/home/lacosa/Downloads/SDCGPKHARA/data/IMG/'
-base_dir = '/Users/mohammedamarnah/Desktop/SDCProject/data/IMG/'
+# Reading from the clean csv after the path fixing
+utils.fixPath()
+data = pd.read_csv('../../data/driving_log_clean.csv')
 
-img_files = listdir('../../data/IMG/')
+# Shuffling the data
+data = data.sample(frac=1).reset_index(drop=True)
 
-with open('../../data/driving_log_clean.csv', 'w') as wf:
-    with open('../../data/driving_log.csv', 'r') as rf:
-        reader = csv.reader(rf)
-        writer = csv.writer(wf)
-        for row in reader:
-            rel_path = row[0].split('/')[-1]
-            if rel_path in img_files:
-                real_path = join(base_dir, rel_path)
-                writer.writerow([real_path, row[3]])
+# Splitting the data: 70% Training, 30% Validation (See SPLIT under SOME CONSTANTS)
+train_num = int(data.shape[0]*SPLIT)
+training_data = data.loc[0:train_num-1]
+validation_data = data.loc[train_num:]
 
-with open('../../data/driving_log_clean.csv', 'r') as f:
-    reader = csv.reader(f)
-    data = np.array([row for row in reader])
+# Freeing the memory block cause you know, it needs to be free.
+data = None
 
-np.random.shuffle(data)
-split_i = int(len(data) * 0.9)
+# Generate training and validation data for the model compilation
+train = utils.gen_batches(training_data, BATCH_SIZE)
+valid = utils.gen_batches(validation_data,  BATCH_SIZE)
 
-X_train, y_train = list(zip(*data[:split_i]))
+######################### Model Training ###########################
 
-X_val, y_val = list(zip(*data[split_i:]))
+model = models.nvidia(comp=True, summary=False)
 
-X_train, y_train = np.array(X_train), np.array(y_train)
+history = model.fit_generator(train, samples_per_epoch=SAMPLES_PER_EPOCH,
+                            nb_epoch=EPOCHS, validation_data=valid,
+                            nb_val_samples=VAL_SAMPLES)
 
-X_val, y_val = np.array(X_val), np.array(y_val)
 ####################################################################
-
-
-####################### Model Training #############################
-model = Sequential()
-
-models.nvidia(model)
-
-model.summary()
-
-train = gen_batches(X_train, y_train, 32)
-valid = gen_batches(X_val, y_val, 32)
-
-model.compile(optimizer=Adam(lr=1e-4), loss='mse', metrics=['accuracy'])
-
-history = model.fit_generator(train,
-                            samples_per_epoch=20032,
-                            nb_epoch=8,
-                            validation_data=valid,
-                            nb_val_samples=6400)
-####################################################################
-
-model.save('model.h5')
 
 json = model.to_json()
 model.save_weights('../../save/model.h5')
