@@ -11,10 +11,10 @@ from sklearn.utils import shuffle
 
 from keras.models import Sequential
 
-###### SOME CONSTANTS ######
-SPLIT = 0.7
-BATCH_SIZE = 32
-EPOCHS = 10
+###### TRAINING CONSTANTS ######
+SPLIT = 0.2
+BATCH_SIZE = 64
+EPOCHS = 25
 VAL_SAMPLES = 30000
 SAMPLES_PER_EPOCH = (20000//BATCH_SIZE)*BATCH_SIZE
 ############################

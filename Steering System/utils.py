@@ -57,16 +57,30 @@ def rgb2gray(img):
     ret = np.mean(img, axis=2, keepdims=True)
     return ret
     
-def normalize(imgs):
-    imgs = (imgs / 255) - 0.5
-    return imgs
+def normalize(img):
+    #img = (img / 255) - 0.5
+    return img
 
-def preprocess(imgs):
-    imgs1 = resize(imgs)
-    imgs2 = rgb2gray(imgs1)
-    imgs3 = normalize(imgs2)
+def preprocess(img):
+    img1 = resize(img)
+    img2 = rgb2gray(img1)
+    img3 = normalize(img2)
     
-    return imgs3
+    return img3
+
+def augment_brightness(img):
+    newimg = cv2.cvtColor(img,cv2.COLOR_RGB2HSV)
+
+    # randomly generate the brightness reduction factor
+    # Add a constant so that it prevents the image from being completely dark
+    random_bright = .30+np.random.uniform()
+
+    # Apply the brightness reduction to the V channel
+    newimg[:,:,2] = newimg[:,:,2]*random_bright
+
+    # convert to RBG again
+    newimg = cv2.cvtColor(newimg,cv2.COLOR_HSV2RGB)
+    return newimg
 
 ####################################################
 
@@ -77,10 +91,10 @@ class PID:
         self.preverror = 0
         self.integral = 0
 
-    def calc(self, speed, dt = 0.1, kp = 0.1, kd = 0.01, ki = 0.5):
+    def calc(self, speed, mx, dt = 0.1, kp = 0.1, kd = 0.01, ki = 0.5):
 
         # Calculate the error
-        error = 25.0 - speed
+        error = mx - speed
 
         # Proportional Term
         Pout = kp * error
@@ -105,20 +119,6 @@ class PID:
         return throttle
 
 ####################################################
-
-def augment_brightness(img):
-    newimg = cv2.cvtColor(img,cv2.COLOR_RGB2HSV)
-
-    # randomly generate the brightness reduction factor
-    # Add a constant so that it prevents the image from being completely dark
-    random_bright = .25+np.random.uniform()
-
-    # Apply the brightness reduction to the V channel
-    newimg[:,:,2] = newimg[:,:,2]*random_bright
-
-    # convert to RBG again
-    newimg = cv2.cvtColor(newimg,cv2.COLOR_HSV2RGB)
-    return newimg
 
 def read(row):
     steering = row['steering']
@@ -166,14 +166,3 @@ def gen_batches(data, batch_size=32):
             i = 0
         
         yield X_batch, y_batch
-
-
-
-
-
-
-
-
-
-
-

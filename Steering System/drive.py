@@ -52,12 +52,12 @@ def telemetry(sid, data):
     ############ Calculate the appropriate speed for this frame ##########
     
     pid = utils.PID()
-    throttle = pid.calc(speed)
+    throttle = pid.calc(speed, 25)
     
     ######################################################################
 
     print(steering_angle, throttle)
-    
+
     # Sends the predicted steering angle 
     # and the calculated throttle to the car
     send_control(steering_angle, throttle)
