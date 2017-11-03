@@ -107,3 +107,4 @@ def custom_architecture(comp=False, summary=False):
 		model.summary()
 
 	return model
+	

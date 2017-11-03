@@ -43,8 +43,10 @@ def fixPath():
                 s += ','
                 s += row[3]
                 wf.write(s+'\n')
+    preverror = 0
+    integral = 0
 
-####################################################
+################# Preprocessing ####################
 
 def resize(img, shape=(64, 64, 3)):
     cropped_image = img[55:135, :, :]
@@ -52,7 +54,8 @@ def resize(img, shape=(64, 64, 3)):
     return processed_image
 
 def rgb2gray(img):
-    return np.mean(img, axis=2, keepdims=True)
+    ret = np.mean(img, axis=2, keepdims=True)
+    return ret
     
 def normalize(imgs):
     imgs = (imgs / 255) - 0.5
@@ -64,6 +67,42 @@ def preprocess(imgs):
     imgs3 = normalize(imgs2)
     
     return imgs3
+
+####################################################
+
+################# PID Controller ###################
+
+class PID:
+    def __init__(self):
+        self.preverror = 0
+        self.integral = 0
+
+    def calc(self, speed, dt = 0.1, kp = 0.1, kd = 0.01, ki = 0.5):
+
+        # Calculate the error
+        error = 25.0 - speed
+
+        # Proportional Term
+        Pout = kp * error
+
+        # Integral Term
+        self.integral += (error * dt)
+        Iout = ki * self.integral
+
+        # Derivative Term
+        derivative = (error - self.preverror) / dt
+        Dout = kd * derivative
+
+        throttle = Pout + Iout + Dout
+
+        self.preverror = error
+
+        if throttle > 1:
+            throttle = 1
+        elif throttle < 0:
+            throttle = 0
+
+        return throttle
 
 ####################################################
 

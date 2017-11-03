@@ -7,6 +7,8 @@ import eventlet
 import eventlet.wsgi
 import time
 
+import utils
+
 import numpy as np
 
 from PIL import Image
@@ -16,8 +18,6 @@ from io import BytesIO
 
 from keras.models import model_from_json
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
-
-from utils import *
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -38,19 +38,28 @@ def telemetry(sid, data):
 
     # The current image from the center camera of the car
     imgString = data["image"]
+
+    ############# Predict the current Steering Angle ####################
+
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
-    
-    image_array = preprocess(image_array)
-
+    image_array = utils.preprocess(image_array)
     transformed_image_array = image_array[None, :, :, :]
-
-    steering_angle = float(model.predict(img_processed, batch_size=1))
+    steering_angle = float(model.predict(transformed_image_array, batch_size=1))
     
-    # The driving model currently just outputs a constant throttle. Feel free to edit this.
-    throttle = (15 - speed) * 0.5
+    ######################################################################
+
+    ############ Calculate the appropriate speed for this frame ##########
+    
+    pid = utils.PID()
+    throttle = pid.calc(speed)
+    
+    ######################################################################
 
     print(steering_angle, throttle)
+    
+    # Sends the predicted steering angle 
+    # and the calculated throttle to the car
     send_control(steering_angle, throttle)
 
 
