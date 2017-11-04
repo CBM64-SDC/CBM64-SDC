@@ -1,19 +1,16 @@
 # CBM64-SDC
 
 ## Current Model Configurations:
-Research Name: Nvidia End-to-End Learning for Self Driving Car
+Inspired by Nvidia End-to-End Learning for Self Driving Car
 
-Number of Parameters: >= 800,000
+Number of Parameters: >= 5,000,000
 
-Number of epochs: 8
+Number of epochs: 10
 
-Input Shape: 64 x 64 x 3
+Input Shape: 64 x 64
 
-Preprocessing: Normalization + Resizing + Random Flipping (Augmentation)
+Preprocessing: Brightness Augmentation, Resizing and Cropping, Grayscale Conversion, and Normalization.
 
 Learning Rate: 1e-4
 
-Throttle (drive.py): 0.2
-
-Results: 
-  loss: 0.0065 - val_loss: 0.0084
+Throttle (drive.py): Controlled by PID controller.
