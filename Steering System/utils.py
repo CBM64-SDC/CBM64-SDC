@@ -45,6 +45,9 @@ def fixPath():
                 s += row[3]
                 wf.write(s+'\n')
 
+def combine_data():
+    return 0
+
 def visualize_distribution(data):
     num_bins = 23
     avg_samples_per_bin = len(data)/num_bins

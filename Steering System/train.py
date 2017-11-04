@@ -43,15 +43,15 @@ valid = utils.gen_batches(validation_data,  BATCH_SIZE)
 
 ######################### Model Training ###########################
 
-# model = models.nvidia(comp=True, summary=True)
+model = models.nvidia(comp=True, summary=True)
 
-# history = model.fit_generator(train, samples_per_epoch=SAMPLES_PER_EPOCH,
-#                             nb_epoch=EPOCHS, validation_data=valid,
-#                             nb_val_samples=VAL_SAMPLES)
+history = model.fit_generator(train, samples_per_epoch=SAMPLES_PER_EPOCH,
+                            nb_epoch=EPOCHS, validation_data=valid,
+                            nb_val_samples=VAL_SAMPLES)
 
-# ####################################################################
+####################################################################
 
-# json = model.to_json()
-# model.save_weights('../../save/model.h5')
-# with open('../../save/model.json', 'w') as f:
-#     f.write(json)
+json = model.to_json()
+model.save_weights('../../save/model.h5')
+with open('../../save/model.json', 'w') as f:
+    f.write(json)
