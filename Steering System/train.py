@@ -31,6 +31,9 @@ train_num = int(data.shape[0]*SPLIT)
 training_data = data.loc[0:train_num-1]
 validation_data = data.loc[train_num:]
 
+# Visualize the distribution of (Y) -- the steering angles
+# utils.visualize_distribution(training_data['steering'])
+
 # Freeing the memory block cause you know, it needs to be free.
 data = None
 
@@ -40,15 +43,15 @@ valid = utils.gen_batches(validation_data,  BATCH_SIZE)
 
 ######################### Model Training ###########################
 
-model = models.nvidia(comp=True, summary=False)
+# model = models.nvidia(comp=True, summary=True)
 
-history = model.fit_generator(train, samples_per_epoch=SAMPLES_PER_EPOCH,
-                            nb_epoch=EPOCHS, validation_data=valid,
-                            nb_val_samples=VAL_SAMPLES)
+# history = model.fit_generator(train, samples_per_epoch=SAMPLES_PER_EPOCH,
+#                             nb_epoch=EPOCHS, validation_data=valid,
+#                             nb_val_samples=VAL_SAMPLES)
 
-####################################################################
+# ####################################################################
 
-json = model.to_json()
-model.save_weights('../../save/model.h5')
-with open('../../save/model.json', 'w') as f:
-    f.write(json)
+# json = model.to_json()
+# model.save_weights('../../save/model.h5')
+# with open('../../save/model.json', 'w') as f:
+#     f.write(json)

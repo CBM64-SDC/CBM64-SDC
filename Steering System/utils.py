@@ -2,6 +2,7 @@ import cv2
 import csv
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from scipy.misc import imread, imresize
 from sklearn.utils import shuffle
@@ -43,8 +44,16 @@ def fixPath():
                 s += ','
                 s += row[3]
                 wf.write(s+'\n')
-    preverror = 0
-    integral = 0
+
+def visualize_distribution(data):
+    num_bins = 23
+    avg_samples_per_bin = len(data)/num_bins
+    hist, bins = np.histogram(data, num_bins)
+    width = 0.7 * (bins[1] - bins[0])
+    center = (bins[:-1] + bins[1:]) / 2
+    plt.bar(center, hist, align='center', width=width)
+    plt.plot((np.min(data), np.max(data)), (avg_samples_per_bin, avg_samples_per_bin), 'k-')
+    plt.show()
 
 ################# Preprocessing ####################
 
@@ -58,7 +67,7 @@ def rgb2gray(img):
     return ret
     
 def normalize(img):
-    #img = (img / 255) - 0.5
+    img = (img / 255) - 0.5
     return img
 
 def preprocess(img):

@@ -5,21 +5,21 @@ from keras.layers import BatchNormalization, Conv2D, ConvLSTM2D, Dense, MaxPooli
 def nvidia(comp=False, summary=False):
 	model = Sequential()
 
-	model.add(BatchNormalization(epsilon=0.001,mode=2, axis=2,input_shape=(64, 64, 1)))
+	#model.add(BatchNormalization(epsilon=0.001, mode=2, axis=2, ))
 
-	model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='valid', activation='relu'))
+	model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', activation='relu', input_shape=(64, 64, 1)))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-	model.add(Conv2D(36, 5, 5, subsample=(2, 2), border_mode='valid', activation='relu'))
+	model.add(Conv2D(36, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-	model.add(Conv2D(48, 5, 5, subsample=(2, 2), border_mode='valid', activation='relu'))
+	model.add(Conv2D(48, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='valid', activation='relu'))
+	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
-	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='valid', activation='relu'))
+	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
 	model.add(Flatten())
