@@ -53,7 +53,72 @@ def nvidia(comp=False, summary=False):
 	if summary:
 		model.summary()
 
-	return model
+	return model, 'nvidia'
+
+def nvidia_2(comp=False, summary=False):
+	model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', activation='relu', input_shape=(64, 64, 1)))
+	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+	model.add(Conv2D(36, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
+	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+	model.add(Conv2D(48, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
+	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
+	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
+	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+
+	model.add(Flatten())
+
+	model.add(Dense(1164, activation='relu'))
+	#model.add(Dropout(0.5))
+
+	model.add(Dense(100, activation='relu'))
+	#model.add(Dropout(0.5))
+
+	model.add(Dense(50, activation='relu'))
+	#model.add(Dropout(0.5))
+
+	model.add(Dense(10, activation='relu'))
+
+	model.add(Dense(1, activation='tanh', name='output'))
+
+	if comp:
+		model.compile(optimizer=Adam(lr=1e-4), loss='mse', metrics=['accuracy'])
+	if summary:
+		model.summary()
+
+	return model, 'nvidia_2'
+
+def comma_ai(comp=False, summary=False):
+	model = Sequential()
+
+	model.add(Conv2D(16, 8, 8, subsample=(4, 4), border_mode="same", input_shape=(64, 64, 1)))
+	model.add(ELU())
+	
+	model.add(Conv2D(32, 5, 5, subsample=(2, 2), border_mode="same"))
+	model.add(ELU())
+	
+	model.add(Conv2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
+	model.add(Flatten())
+	model.add(Dropout(.2))
+	model.add(ELU())
+	
+	model.add(Dense(512))
+	model.add(Dropout(.5))
+	model.add(ELU())
+	
+	model.add(Dense(1))
+
+	if comp:
+		model.compile(optimizer=Adam(lr=1e-6), loss='mse', metrics=['accuracy'])
+	if summary:
+		model.summary()
+
+	return model, 'comma_ai'
 
 def alexnet(comp=False, summary=False):
 	model = Sequential()
@@ -89,7 +154,7 @@ def alexnet(comp=False, summary=False):
 	if summary:
 		model.summary()
 
-	return model
+	return model, 'alexnet'
 
 def custom_architecture(comp=False, summary=False):
 	model = Sequential()

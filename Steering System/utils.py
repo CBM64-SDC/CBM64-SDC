@@ -12,17 +12,19 @@ from os.path import join
 
 from keras.preprocessing.image import img_to_array, load_img
 
-def fixPath():
-    base_dir = '/home/lacosa/Downloads/SDCGPKHARA/data/IMG/'
-    base_dir = '/Users/mohammedamarnah/Desktop/SDCProject/data/IMG/'
-    img_files = listdir('../../data/IMG/')
+def fixPath(base_d, path, append=False):
+    base_dir = base_d
+    img_files = listdir(path+'/IMG/')
 
     x = 0
-    with open('../../data/driving_log_clean.csv', 'w') as wf:
-        with open('../../data/driving_log.csv', 'r') as rf:
+    mode = 'w'
+    if append:
+        mode = 'a'
+    with open('../../data/driving_log_clean.csv', mode) as wf:
+        with open(path+'/driving_log.csv', 'r') as rf:
             reader = csv.reader(rf)
             writer = csv.writer(wf)
-            if x == 0:
+            if x == 0 and mode == 'w':
                 wf.write('center,left,right,steering\n')
                 x = 1
             for row in reader:
@@ -44,9 +46,6 @@ def fixPath():
                 s += ','
                 s += row[3]
                 wf.write(s+'\n')
-
-def combine_data():
-    return 0
 
 def visualize_distribution(data):
     num_bins = 23
