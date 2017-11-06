@@ -52,7 +52,7 @@ def telemetry(sid, data):
     ############ Calculate the appropriate speed for this frame ##########
     
     pid = utils.PID()
-    throttle = pid.calc(speed, 25)
+    throttle = pid.calc(speed, 15)
     
     ######################################################################
 

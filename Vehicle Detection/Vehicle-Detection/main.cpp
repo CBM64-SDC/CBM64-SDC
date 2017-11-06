@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include "opencv2/objdetect.hpp"
 
 int main(int argc, const char * argv[]) {
     // insert code here...
