@@ -1,15 +1,15 @@
 from keras.models import Sequential
 from keras.optimizers import Adam
-from keras.layers import BatchNormalization, Conv2D, ConvLSTM2D, Dense, MaxPooling2D, Dropout, Flatten, Lambda
+from keras.layers import BatchNormalization, Conv2D, ConvLSTM2D, Dense, MaxPooling2D, Dropout, Flatten, Lambda, Convolution2D
 from keras.layers.advanced_activations import ELU
 from keras.regularizers import l2, activity_l2
 
-def nvidia(comp=False, summary=False):
+def nvidia(LR=1e-4, inputshape=(64, 64, 1), comp=False, summary=False):
 	model = Sequential()
 
 	#model.add(BatchNormalization(epsilon=0.001, mode=2, axis=2, ))
 
-	model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', W_regularizer=l2(0.001), input_shape=(64, 64, 1)))
+	model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', W_regularizer=l2(0.001), input_shape=inputshape))
 	model.add(ELU())
 	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
@@ -49,60 +49,62 @@ def nvidia(comp=False, summary=False):
 	model.add(Dense(1, name='output'))
 
 	if comp:
-		model.compile(optimizer=Adam(lr=1e-4), loss='mse', metrics=['accuracy'])
+		model.compile(optimizer=Adam(lr=LR), loss='mse', metrics=['accuracy'])
 	if summary:
 		model.summary()
 
 	return model, 'nvidia'
 
-def nvidia_2(comp=False, summary=False):
-	model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', activation='relu', input_shape=(64, 64, 1)))
-	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+def nvidia_2(LR=1e-4, inputshape=(64, 64, 1), comp=False, summary=False):
+	model = Sequential()
+
+	model.add(Conv2D(24, 5, 5, subsample=(2, 2), border_mode='same', activation='relu', input_shape=inputshape))
+	model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
 	model.add(Conv2D(36, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
-	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+	model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
 	model.add(Conv2D(48, 5, 5, subsample=(2, 2), border_mode='same', activation='relu'))
-	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+	model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
 	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
-	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+	model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
 	model.add(Conv2D(64, 3, 3, subsample=(1, 1), border_mode='same', activation='relu'))
-	#model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
+	model.add(MaxPooling2D(pool_size=(2, 2), strides=(1, 1)))
 
 	model.add(Flatten())
 
 	model.add(Dense(1164, activation='relu'))
-	#model.add(Dropout(0.5))
+	model.add(Dropout(0.5))
 
 	model.add(Dense(100, activation='relu'))
-	#model.add(Dropout(0.5))
+	model.add(Dropout(0.5))
 
 	model.add(Dense(50, activation='relu'))
-	#model.add(Dropout(0.5))
+	model.add(Dropout(0.5))
 
 	model.add(Dense(10, activation='relu'))
 
 	model.add(Dense(1, activation='tanh', name='output'))
 
 	if comp:
-		model.compile(optimizer=Adam(lr=1e-4), loss='mse', metrics=['accuracy'])
+		model.compile(optimizer=Adam(lr=LR), loss='mse', metrics=['accuracy'])
 	if summary:
 		model.summary()
 
 	return model, 'nvidia_2'
 
-def comma_ai(comp=False, summary=False):
+def comma_ai(LR=1e-4, inputshape=(64, 64, 1), comp=False, summary=False):
 	model = Sequential()
 
-	model.add(Conv2D(16, 8, 8, subsample=(4, 4), border_mode="same", input_shape=(64, 64, 1)))
+	model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="valid", input_shape=inputshape))
 	model.add(ELU())
 	
-	model.add(Conv2D(32, 5, 5, subsample=(2, 2), border_mode="same"))
+	model.add(Convolution2D(32, 5, 5, subsample=(2, 2), border_mode="valid"))
 	model.add(ELU())
 	
-	model.add(Conv2D(64, 5, 5, subsample=(2, 2), border_mode="same"))
+	model.add(Convolution2D(64, 5, 5, subsample=(2, 2), border_mode="valid"))
 	model.add(Flatten())
 	model.add(Dropout(.2))
 	model.add(ELU())
@@ -114,16 +116,16 @@ def comma_ai(comp=False, summary=False):
 	model.add(Dense(1))
 
 	if comp:
-		model.compile(optimizer=Adam(lr=1e-6), loss='mse', metrics=['accuracy'])
+		model.compile(optimizer=Adam(lr=LR), loss='mse', metrics=['accuracy'])
 	if summary:
 		model.summary()
 
 	return model, 'comma_ai'
 
-def alexnet(comp=False, summary=False):
+def alexnet(LR=1e-4, inputshape=(64, 64, 1), comp=False, summary=False):
 	model = Sequential()
 
-	model.add(Conv2D(64, 11, 11, border_mode='same', activation='relu', input_shape=(64,64,3)))
+	model.add(Conv2D(64, 11, 11, border_mode='same', activation='relu', input_shape=inputshape))
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 
 	model.add(Conv2D(128, 7, 7, border_mode='same', activation='relu'))
@@ -150,7 +152,7 @@ def alexnet(comp=False, summary=False):
 	model.add(Dense(1, activation='tanh'))
 
 	if comp:
-		model.compile(optimizer=Adam(lr=1e-4), loss='mse', metrics=['accuracy'])
+		model.compile(optimizer=Adam(lr=LR), loss='mse', metrics=['accuracy'])
 	if summary:
 		model.summary()
 

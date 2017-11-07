@@ -61,11 +61,12 @@ def visualize_distribution(data):
 
 def resize(img, shape=(64, 64, 3)):
     cropped_image = img[55:135, :, :]
-    processed_image = imresize(cropped_image, shape)
-    return processed_image
+    #processed_image = imresize(cropped_image, shape)
+    return cropped_image
 
 def rgb2gray(img):
-    ret = np.mean(img, axis=2, keepdims=True)
+    ret = np.zeros(img.shape)
+    ret = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     return ret
     
 def normalize(img):
@@ -76,7 +77,6 @@ def preprocess(img):
     img1 = resize(img)
     img2 = rgb2gray(img1)
     img3 = normalize(img2)
-    
     return img3
 
 def augment_brightness(img):
@@ -141,12 +141,11 @@ def read(row):
     elif camera == 'Right':
         steering -= 0.25
 
-    img = load_img(row[camera])
-    img = img_to_array(img)
+    img = imread(row[camera])
 
-    coin = np.random.random()
+    coin = np.random.randint(0,1)
 
-    if coin > 0.5:
+    if coin:
         steering = -1*steering
         img = cv2.flip(img, 1)
 
@@ -163,13 +162,15 @@ def gen_batches(data, batch_size=32):
         s = i * batch_size
         e = s + batch_size - 1
 
-        X_batch = np.zeros((batch_size, 64, 64, 1), dtype=np.float32)
+        X_batch = np.zeros((batch_size, 80, 320, 1), dtype=np.float32)
         y_batch = np.zeros((batch_size,), dtype=np.float32)
 
         j = 0
 
         for index, row in data.loc[s:e].iterrows():
-            X_batch[j], y_batch[j] = read(row)
+            x, y = read(row)
+            X_batch[j] = x.reshape(x.shape[0], x.shape[1], 1)
+            y_batch[j] = y
             j += 1
 
         i += 1
