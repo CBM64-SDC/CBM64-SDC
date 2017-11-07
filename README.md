@@ -14,3 +14,9 @@ Preprocessing: Brightness Augmentation, Resizing and Cropping, Grayscale Convers
 Learning Rate: 1e-4
 
 Throttle (drive.py): Controlled by PID controller.
+
+################################### Datasets ############################################
+
+Haar Cascade datasets for various objects: https://github.com/opencv/opencv/tree/master/data/haarcascades
+
+

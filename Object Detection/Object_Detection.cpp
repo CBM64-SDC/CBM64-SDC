@@ -7,8 +7,8 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    if (argc < 3) {
-        printf("Insufficient number parameters were passed to the file.\n");
+    if (argc < 4) {
+        printf("Insufficient number of parameters were passed to the file.\n");
         printf("Compliation terminated\n");
         return 0;
     }
@@ -41,9 +41,13 @@ int main(int argc, char** argv) {
             Point pt1(cars[i].x + cars[i].width, cars[i].y + cars[i].height);
             Point pt2(cars[i].x, cars[i].y);
 
+
+
             
             rectangle(Frame, pt1, pt2, Scalar(0, 0, 255, 0), 2, 8 ,0);
         }
+
+        
 
 
         
