@@ -7,7 +7,7 @@ using namespace cv;
 
 int main(int argc, char** argv) {
 
-    if (argc < 4) {
+    if (argc < 3) {
         printf("Insufficient number of parameters were passed to the file.\n");
         printf("Compliation terminated\n");
         return 0;
