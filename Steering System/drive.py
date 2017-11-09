@@ -43,18 +43,17 @@ def telemetry(sid, data):
 
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
-    image_array = utils.augment_brightness(image_array)
     image_array = utils.preprocess(image_array)
-    image_array = image_array.reshape(image_array.shape[0], image_array.shape[1], 1)
-    transformed_image_array = image_array[None, :, :, :]
-    steering_angle = float(model.predict(transformed_image_array, batch_size=1))
+    image_array = np.array([image_array])
+
+    steering_angle = float(model.predict(image_array, batch_size=1))
     
     ######################################################################
 
     ############ Calculate the appropriate speed for this frame ##########
     
     pid = utils.PID()
-    throttle = pid.calc(speed, 20)
+    throttle = pid.calc(speed, 30)
     
     ######################################################################
 
