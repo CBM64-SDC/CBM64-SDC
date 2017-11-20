@@ -24,6 +24,9 @@ app = Flask(__name__)
 model = None
 prev_image_array = None
 
+def f(x):
+    return -(x**2)
+
 @sio.on('telemetry')
 def telemetry(sid, data):
     # The current steering angle of the car
@@ -53,7 +56,8 @@ def telemetry(sid, data):
     ############ Calculate the appropriate speed for this frame ##########
     
     pid = utils.PID()
-    throttle = pid.calc(speed, 30)
+    x = steering_angle
+    throttle = pid.calc(speed, 30 + f(x))
     
     ######################################################################
 
