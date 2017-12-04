@@ -51,7 +51,7 @@ for index, row in data.iterrows():
 	if row['steering'] == 0:
 		ind.append(index)
 		bad -= 1
-	if bad == 750:
+	if bad == 2000:
 		break
 data = data.drop(data.index[ind]).reset_index(drop=True)
 # #################

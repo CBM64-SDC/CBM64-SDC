@@ -154,7 +154,7 @@ class PID:
         self.preverror = 0
         self.integral = 0
 
-    def calc(self, speed, mx, dt = 0.1, kp = 0.1, kd = 0.01, ki = 0.5):
+    def calc(self, speed, mx = 30, dt = 0.1, kp = 0.1, kd = 0.01, ki = 0.5):
 
         # Calculate the error
         error = mx - speed
