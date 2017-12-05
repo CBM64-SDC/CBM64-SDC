@@ -11,9 +11,9 @@ using namespace cv;
 using namespace std;
 
 Mat src, originalImage, srcGray, gradientX, gradientY, gradient;
-Mat absoluteGradientX, absoluteGradientY, image;
-//int ddepth, scale, delta;
-string window_name = "Simple Edge Detector";
+Mat absoluteGradientX, absoluteGradientY, image, srcBlured, sobeled, edges;
+
+string window_name = "Edge Detector";
 
 int scale = 1;
 int delta = 0;
@@ -26,7 +26,9 @@ int max_trackbar = 50;
 int s_trackbar = max_trackbar;
 int min_threshold = 50;
 //#########
-//vector<vector<int>> image;
+
+Point oldPt1, oldPt2;
+bool flag = 0;
 
 void printPicture(Mat soorah){
 	uint8_t *myData = soorah.data;
@@ -40,51 +42,65 @@ void printPicture(Mat soorah){
 }
 
 void Standard_Hough( int, void* ){
-  vector<Vec2f> s_lines;
-  cvtColor( image2, standard_hough, COLOR_GRAY2BGR );
+	vector<Vec2f> s_lines;
+	cvtColor( edges, standard_hough, COLOR_GRAY2BGR );
 
-  /// 1. Use Standard Hough Transform
-  HoughLines( image2, s_lines, 1, CV_PI/180, min_threshold + s_trackbar, 0, 0 );
+	// Standard Hough Transform
+	HoughLines( edges, s_lines, 1, CV_PI/180, min_threshold + s_trackbar, 0, 0 );
 
-  /// Show the result
-  bool foundleft = 0, foundright = 0;
-  for( size_t i = 0; i < s_lines.size(); i++ ){
-    float r = s_lines[i][0], t = s_lines[i][1];
-    double cos_t = cos(t), sin_t = sin(t);
-    double x0 = r*cos_t, y0 = r*sin_t;
-    double alpha = 1000;
+	/// Show the resulted lines
+	bool foundleft = 0, foundright = 0;
+	for( size_t i = 0; i < s_lines.size(); i++ ){
+		float r = s_lines[i][0], t = s_lines[i][1];
+		double cos_t = cos(t), sin_t = sin(t);
+		double x0 = r*cos_t, y0 = r*sin_t;
+		double alpha = 1000;
 
-     Point pt1( cvRound(x0 + alpha*(-sin_t)), cvRound(y0 + alpha*cos_t) );
-     Point pt2( cvRound(x0 - alpha*(-sin_t)), cvRound(y0 - alpha*cos_t) );
-     //cout << pt1.x << " " << pt1.y << endl << pt2.x << " " << pt2.y << endl << endl << endl;
-     if ((pt1.x >= 0 || pt1.y >= 0) && !foundleft)
-     	foundleft = 1;
-     foundright = (pt2.x >= 0 || pt2.y >= 0);
-     line( standard_hough, pt1, pt2, Scalar(0,0,255), 3, LINE_AA);
- 	}
-
- 	if (foundleft)
- 		cout << "Left Lane Found!" << " ";
- 	else cout << "LACOSA KILLED ME :(" << " ";
-
- 	if (foundright)
- 		cout << "Right Lane Found!" << endl;
- 	else
- 		cout << "LACOSA KILLLLLED ME! :(" << endl;
+		Point pt1( cvRound(x0 + alpha*(-sin_t)), cvRound(y0 + alpha*cos_t) );
+		Point pt2( cvRound(x0 - alpha*(-sin_t)), cvRound(y0 - alpha*cos_t) );
+		if((pt1.x >= 0 || pt1.y >= 0) && !foundleft)
+			foundleft = 1;
+		if((pt2.x >= 0 || pt2.y >= 0) && !foundright)
+			foundright = 1;
+		if(!foundleft && flag){
+			pt1 = oldPt1;
+		}
+		if(!foundright && flag)
+			pt2 = oldPt2;
+		line( standard_hough, pt1, pt2, Scalar(0,0,255), 3, LINE_AA);
+		oldPt1 = pt1;
+		oldPt2 = pt2;
+		flag = 1;
+	}
 
 	//imshow( window_name, standard_hough );
- 	//waitKey(0);
+	//waitKey(0);
 }
 
-Mat SobelThreshold(Mat imageX, uint8_t min=100, uint8_t max=200){
+Mat SobelThreshold(Mat src, uint8_t min=100, uint8_t max=200){
+
+	//GaussianBlur to remove the noise
+	GaussianBlur(src, srcBlured, Size(3,3), 0, 0, BORDER_DEFAULT);
+	//Convert to grayscale
+	cvtColor(src, srcGray, CV_BGR2GRAY);
+	//Derivatives calculations in X and Y directions using Sobel
+		//Gradient X
+	Sobel(srcGray, gradientX, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT);
+		//Gradient Y
+	Sobel(srcGray, gradientY, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT);
+	//Scale, calculate absolute values and convert the result to 8-bit;
+	convertScaleAbs(gradientX, absoluteGradientX);
+	convertScaleAbs(gradientY, absoluteGradientY);
+	//Calculate the weighted sum of two arrays, (approximately!)
+	addWeighted(absoluteGradientX, 0.5, absoluteGradientY, 0.5, -75, gradient);
 
 	vector<vector<uint8_t> > img;
-	img.resize(imageX.rows);
-	for(int i=0; i<imageX.rows; ++i){
+	img.resize(gradient.rows);
+	for(int i=0; i<gradient.rows; ++i){
 		vector<uint8_t> temp;
-		temp.resize(imageX.cols);
-		uint8_t* p = imageX.ptr<uint8_t>(i);
-		for(int j=0; j<imageX.cols; ++j){
+		temp.resize(gradient.cols);
+		uint8_t* p = gradient.ptr<uint8_t>(i);
+		for(int j=0; j<gradient.cols; ++j){
 			//uint8_t val = myData[i + _stride + j];
 			if(p[j] >= min && p[j] <= max)
 				temp[j] = 255;
@@ -93,13 +109,13 @@ Mat SobelThreshold(Mat imageX, uint8_t min=100, uint8_t max=200){
 		}
 		img[i] = temp;
 	}
-	Mat myImage(img.size(), img[0].size(), CV_8UC1);
-	for(int i=0; i<myImage.rows; ++i){
-		for(int j=0; j<myImage.cols; ++j){
-			myImage.at<uint8_t>(i,j) = img[i][j];
+	Mat sobeled(img.size(), img[0].size(), CV_8UC1);
+	for(int i=0; i<sobeled.rows; ++i){
+		for(int j=0; j<sobeled.cols; ++j){
+			sobeled.at<uint8_t>(i,j) = img[i][j];
 		}
 	}
-	return myImage;
+	return sobeled;
 	// imshow(window_name, myImage);
 	// waitKey(0);
 
@@ -110,7 +126,7 @@ int main(int argc, char** argv){
 	VideoCapture cap(argv[1]);
 
 	if(!cap.isOpened()){
-		cout << "Error" << endl;
+		cout << "Error, not a valid video!" << endl;
 		exit(1);
 	}
 	while(1){
@@ -125,30 +141,12 @@ int main(int argc, char** argv){
 		if(!src.data)
 			return -1;
 		originalImage = src;
-		//GaussianBlur to remove the noise
-		GaussianBlur(src, src, Size(3,3), 0, 0, BORDER_DEFAULT);
-		//Convert to grayscale
-		cvtColor(src, srcGray, CV_BGR2GRAY);
-		//Derivatives calculations in X and Y directions using Sobel
-			//Gradient X
-		Sobel(srcGray, gradientX, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT);
-			//Gradient Y
-		Sobel(srcGray, gradientY, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT);
-		//Scale, calculate absolute values and convert the result to 8-bit;
-		convertScaleAbs(gradientX, absoluteGradientX);
-		convertScaleAbs(gradientY, absoluteGradientY);
-		//Calculate the weighted sum of two arrays, (approximately!)
-		addWeighted(absoluteGradientX, 0.5, absoluteGradientY, 0.5, -75, gradient);
-		//###
-		image = SobelThreshold(gradient);
+		//Apply Sobel Threshold
+		sobeled = SobelThreshold(src);
 		//Apply Canny edge detector
-		Canny(image, image2, 50, 200, 3 );
-		// Create Trackbars for Thresholds
-   		//char thresh_label[50];
-		//createTrackbar( thresh_label, window_name, &s_trackbar, max_trackbar, Standard_Hough);
-		//
+		Canny(sobeled, edges, 50, 200, 3 );
+		//Standard HoughTransform
 		Standard_Hough(0, 0);
-		//threshold(gradient);
 		//Show the result
 		namedWindow(window_name, WINDOW_AUTOSIZE);
 		double timeElapsed = clock() - time;
