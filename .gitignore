@@ -1,1 +1,5 @@
 .DS_Store
+*.out
+*.in
+Lane\ Detection/build
+Lane\ Detection/*.xcodeproj
