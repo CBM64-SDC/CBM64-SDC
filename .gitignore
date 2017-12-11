@@ -3,7 +3,7 @@
 *.in
 Lane\ Detection/build
 Lane\ Detection/*.xcodeproj
-TrafficRecognition/build
+Traffic\ Recognition/build
 Traffic\ Recognition/*.xcodeproj
 Traffic\ Recognition/data/train
 Traffic\ Recognition/data/valid
