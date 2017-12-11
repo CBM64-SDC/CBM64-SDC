@@ -101,6 +101,6 @@ history = model.fit_generator(train, samples_per_epoch=SAMPLES_PER_EPOCH,
 ####################################################################
 
 json = model.to_json()
-model.save_weights('../save/model-'+name+'.h5')
-with open('../save/model-'+name+'.json', 'w') as f:
+model.save_weights('./save/model-'+name+'.h5')
+with open('./save/model-'+name+'.json', 'w') as f:
     f.write(json)
