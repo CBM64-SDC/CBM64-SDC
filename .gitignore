@@ -4,10 +4,10 @@
 Lane\ Detection/build
 Lane\ Detection/*.xcodeproj
 TrafficRecognition/build
-TrafficRecognition/*.xcodeproj
-TrafficRecognition/data/train
-TrafficRecognition/data/valid
-TrafficRecognition/data/test
-TrafficRecognition/data/*.mp4
-Steering\ System/save
-
+Traffic\ Recognition/*.xcodeproj
+Traffic\ Recognition/data/train
+Traffic\ Recognition/data/valid
+Traffic\ Recognition/data/test
+Traffic\ Recognition/data/*.mp4
+Steering\ Control/save
+Steering\ Control/__pycache__
