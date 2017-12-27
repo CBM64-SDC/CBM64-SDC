@@ -15,6 +15,7 @@
 #include <memory.h>
 #include <queue>
 #include <vector>
+#include <set>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>

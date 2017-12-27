@@ -59,7 +59,6 @@ void fillSets(cv::Mat &filledContours) {
             v[i][j] = filledContours.at<uint8_t>(i, j);
         }
     }
-    
     // Perform a Breadth-first search (BFS) and assigns every collection
     // of white pixels as a set of points.
     n = (int)v.size(), m = (int)v[0].size();
@@ -140,7 +139,8 @@ void runVideo(string path) {
             out = input;
         }
         
-        cout << "Time Elapsed: " << (clock() - time) / CLOCKS_PER_SEC << endl << endl;
+        double timeElapsed = (clock() - time) / CLOCKS_PER_SEC;
+        cv::putText(out, to_string(1/timeElapsed) + " FPS", cvPoint(30, 40), 3, 1, cvScalar(255));
         cv::imshow("output", out);
 
         char c = cv::waitKey(25);
@@ -160,7 +160,7 @@ int main() {
     colorProcessing clrProc;
     imageProcessing imgProc;
     
-    string path = "/Users/mohammedamarnah/Desktop/SDCProject/CBM64-SDC/TrafficRecognition/data/";
+    string path = "/Users/mohammedamarnah/Desktop/SDCProject/CBM64-SDC/Traffic Recognition/data/";
     string file = "video2.mp4";
     
     // You can run the video file by only passing the path parameter.
@@ -193,7 +193,8 @@ int main() {
     // Assigns the output image
     cv::Mat out = input;
     
-    cout << "Time Elapsed: " << (clock() - time) / CLOCKS_PER_SEC << endl << endl;
+    double timeElapsed = (clock() - time) / CLOCKS_PER_SEC;
+    cv::putText(out, to_string(1/timeElapsed) + " FPS", cvPoint(30, 40), 2, 1, cvScalar(0));
     cv::imshow("output", out);
     cv::waitKey(0);
 }

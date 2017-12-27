@@ -17,10 +17,23 @@ cv::Mat colorProcessing::BGR2IHLS(cv::Mat src) {
     out = src.clone();
     for (auto it = out.begin<cv::Vec3b>(); it != out.end<cv::Vec3b>(); it++) {
         cv::Vec3b bgr = (*it);
-        (*it)[0] = getSat(double(bgr[0]),double(bgr[1]),double(bgr[2]));
-        (*it)[1] = getLum(double(bgr[0]),double(bgr[1]),double(bgr[2]));
-        (*it)[2] = getHue(double(bgr[0]),double(bgr[1]),double(bgr[2]));
+        (*it)[0] = getSat(double(bgr[2]),double(bgr[1]),double(bgr[0]));
+        (*it)[1] = getLum(double(bgr[2]),double(bgr[1]),double(bgr[0]));
+        (*it)[2] = getHue(double(bgr[2]),double(bgr[1]),double(bgr[0]));
     }
+
+    /*for (int i = 0; i < out.rows; i++) {
+        uint8_t *bgr = out.ptr<uint8_t>(i);
+        for (int j = 0; j < out.cols; j++) {
+            uint8_t b, g, r;
+            b = (*bgr);
+            g = (*bgr+1);
+            r = (*bgr+2);
+            (*bgr++) = getSat(double(r), double(g), double(b));
+            (*bgr++) = getLum(double(r), double(g), double(b));
+            (*bgr++) = getHue(double(r), double(g), double(b));
+        }
+    }*/
     return out;
 }
 
