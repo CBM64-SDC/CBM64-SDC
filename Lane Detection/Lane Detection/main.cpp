@@ -438,11 +438,16 @@ Mat HLS(Mat src, uint8_t min=160, uint8_t max=255){
     return output;
 }
 
-Mat regionOfInterest(Mat src, vector<Point> v){
-    Mat output(src.rows, src.cols, CV_8UC1);
+Mat regionOfInterest(Mat src,const Point* v){
+    Mat image = Mat::zeros(src.rows, src.cols, CV_8UC1);
     int ignore = 255;
-    fillPoly(output, v, ignore);
-    
+    int num_points = 8;
+    //fillPoly(image, v[0], &num_points, 1, Scalar(255,255,255), 4);
+    Mat output(src.rows, src.cols, CV_8UC1);
+    //cout << image.rows << " " << image.cols << endl;
+    bitwise_and(src, image, output);
+    return image;
+    //return image;
 }
 
 Mat combinedColorThresholding(Mat hls, Mat combinedGradient){
@@ -452,7 +457,7 @@ Mat combinedColorThresholding(Mat hls, Mat combinedGradient){
             if(hls.at<uint8_t>(i,j) == 255 || combinedGradient.at<uint8_t>(i,j) == 255)
                 output.at<uint8_t>(i,j) = 255;
             else
-                output.at<uint8_t>(i.j) = 0;
+                output.at<uint8_t>(i,j) = 0;
         }
     }
     Point leftBot(100, output.rows);
@@ -463,14 +468,33 @@ Mat combinedColorThresholding(Mat hls, Mat combinedGradient){
     Point apex2(680, 410);
     Point innerApex1(700, 480);
     Point innerApex2(650, 480);
-    vector<Point> vertices;
-    vertices.resize(8);
-    vertices[0] = leftBot;      vertices[1] = rightBot;
-    vertices[2] = innerLeftBot; vertices[3] = innerRightBot;
-    vertices[4] = apex1;        vertices[5] = apex2;
-    vertices[6] = innerApex1;   vertices[7] = innerApex2;
 
-    output = regionOfInterest(output, vertices);
+    // Point leftBot(100, output.rows);
+    // Point rightBot(output.cols - 20, output.rows);
+    // Point innerLeftBot(1000, output.rows);
+    // Point innerRightBot(1150, output.rows);
+    // Point apex1(1000, 1000);
+    // Point apex2(1000, 1000);
+    // Point innerApex1(1000, 1000);
+    // Point innerApex2(1000, 1000);
+    Point vertices[1][8];
+    vertices[0][0] = leftBot;      vertices[0][1] = rightBot;
+    vertices[0][2] = innerLeftBot; vertices[0][3] = innerRightBot;
+    vertices[0][4] = apex1;        vertices[0][5] = apex2;
+    vertices[0][6] = innerApex1;   vertices[0][7] = innerApex2;
+    const Point* corner_list[1] = {vertices[0]};
+
+    //####################
+    Mat image = Mat::zeros(output.rows, output.cols, CV_8UC1);
+    int ignore = 255;
+    int num_points = 8;
+    fillPoly(image, corner_list, &num_points, 1, Scalar(255,255,255), 8);
+    //Mat output(src.rows, src.cols, CV_8UC1);
+    //cout << image.rows << " " << image.cols << endl;
+    bitwise_and(output, image, output);
+    //####################
+
+    //output = regionOfInterest(output, corner_list);
     return output;
 }
 
@@ -482,11 +506,11 @@ int main(int argc, char** argv){
     cap.open(path2);
     namedWindow(window_name, WINDOW_AUTOSIZE);
     //############
-    int frames = (int) cap.get(CAP_PROP_FRAME_COUNT);
-    int tmpw   = (int) cap.get(CAP_PROP_FRAME_WIDTH);
-    int tmph   = (int) cap.get(CAP_PROP_FRAME_HEIGHT);
-    cout << "Video has " << frames << " Frames of dimensions(" << tmpw << ", " << tmph << ")." << endl;
-    createTrackbar("Position", window_name, &g_slider_position, frames, onTrackbarSlide);
+    // int frames = (int) cap.get(CAP_PROP_FRAME_COUNT);
+    // int tmpw   = (int) cap.get(CAP_PROP_FRAME_WIDTH);
+    // int tmph   = (int) cap.get(CAP_PROP_FRAME_HEIGHT);
+    // cout << "Video has " << frames << " Frames of dimensions(" << tmpw << ", " << tmph << ")." << endl;
+    // createTrackbar("Position", window_name, &g_slider_position, frames, onTrackbarSlide);
     //############
 
     
@@ -501,45 +525,59 @@ int main(int argc, char** argv){
             cap >> src;
             if(src.empty())
                 break;
+            originalImage = src;
             //Cut the upper part of the image
-            Rect myROI(src.cols-(src.cols*0.9), src.rows/2, src.cols-(src.cols*0.1), src.rows/2);
-            src = src(myROI);
+            //Rect myROI(src.cols-(src.cols*0.9), src.rows/2, src.cols-(src.cols*0.1), src.rows/2);
+            //src = src(myROI);
             
             if(!src.data)
                 return -1;
-            originalImage = src;
+            //originalImage = src;
 
             //IHLS
             //src = toIHLS(originalImage);
 
             
             //Apply Sobel Threshold
-            sobeledX = sobelThreshold(originalImage, 100, 200, 'x', 3);
-            sobeledY = sobelThreshold(originalImage, 100, 200, 'y', 3);
+            //sobeledX = sobelThreshold(originalImage, 100, 200, 'x', 3);
+            //sobeledY = sobelThreshold(originalImage, 100, 200, 'y', 3);
             
             //Apply Direction Threshold
-            dirThreshold = directionThreshold(originalImage, 0.65, 1.05);
+            //dirThreshold = directionThreshold(originalImage, 0.65, 1.05);
 
             //Apply Magnitude Threshold
-            magThreshold = magnitudeThreshold(originalImage, 40, 255);
+            //magThreshold = magnitudeThreshold(originalImage, 40, 255);
 
             //Apply Combined Thresholding
-            combined = combinedGradientThresholding(sobeledX, sobeledY, dirThreshold, magThreshold);
+            //combined = combinedGradientThresholding(sobeledX, sobeledY, dirThreshold, magThreshold);
 
             //Apply HLS color Threshold
-            hlsed = HLS(originalImage, 100, 250);
+            //hlsed = HLS(originalImage, 100, 250);
 
             //Apply Combined Color Threshold
-            combinedColor = combinedColorThresholding()
+            //combinedColor = combinedColorThresholding(hlsed, combined);
             
             //Perspective Transformation
             //perspectiveTransformed = perspectiveTransformation(edges);
             
             //Apply Canny edge detector
-            Canny(combined, edges, 50, 200, 3);
+            //Canny(combined, edges, 50, 200, 3);
             
             //Standard HoughTransform
-            standardHough(0, 0);
+            //standardHough(0, 0);
+
+            //Test for CTF
+            Mat output(src.rows, src.cols, CV_8UC1);
+            for(int i=0; i<src.rows; ++i){
+                for(int j=0; j<src.cols; ++j){
+                    if(src.at<uint8_t>(i,j) >= 100)
+                        output.at<uint8_t>(i,j) = 255;
+                    else
+                        output.at<uint8_t>(i,j) = 0;
+                }
+            }
+            
+            //flip(src, magThreshold, -1);
             
             // if (flag == 1)
             //     toShow = sobeled;
@@ -558,7 +596,7 @@ int main(int argc, char** argv){
             g_dontset = 1;
             setTrackbarPos("Position", window_name, current_pos);
             //pyrDown(originalImage, src);
-            imshow(window_name, hlsed);
+            imshow(window_name, output);
             g_run -= 1;
         }
 
