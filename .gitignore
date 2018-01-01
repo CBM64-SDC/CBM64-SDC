@@ -3,3 +3,13 @@
 *.in
 Lane\ Detection/build
 Lane\ Detection/*.xcodeproj
+Traffic\ Recognition/build
+Traffic\ Recognition/*.xcodeproj
+Traffic\ Recognition/data/train
+Traffic\ Recognition/data/valid
+Traffic\ Recognition/data/test
+Traffic\ Recognition/data/*.mp4
+Traffic\ Recognition/data/*.h5
+Traffic\ Recognition/data/GTSRB
+Steering\ Control/save
+Steering\ Control/__pycache__
