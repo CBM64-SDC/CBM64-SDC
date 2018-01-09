@@ -10,6 +10,8 @@ Currently, there is an integrated system that is being developed. Once the integ
 * Lane Line Detector: Computer vision and image processing.
 * Vehicle Detection: Computer vision and deep learning.
 * Traffic Sign Recognition: Computer vision and deep learning.
+* Integrated System: Made on QT (C++). An interface to the whole system.
+* Hardware Node: Currently being developed.
 
 ### Datasets Used: 
 * Haar Cascade datasets for various objects: https://goo.gl/NjUdvR
