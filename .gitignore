@@ -11,5 +11,6 @@ Traffic\ Recognition/data/test
 Traffic\ Recognition/data/*.mp4
 Traffic\ Recognition/data/*.h5
 Traffic\ Recognition/data/GTSRB
+Traffic\ Recognition/recognizer/.ipynb_checkpoints
 Steering\ Control/save
 Steering\ Control/__pycache__

@@ -94,13 +94,14 @@ model, name = models.nvidia(LR=1e-4, inputshape=INPUT_SHAPE, comp=True, summary=
 
 print("Training model: ", name)
 
-history = model.fit_generator(train, samples_per_epoch=SAMPLES_PER_EPOCH,
-                            nb_epoch=EPOCHS, max_q_size=1, validation_data=valid,
-                            nb_val_samples=len(X_valid), verbose=1)
+history = model.fit_generator(train, epochs=EPOCHS,
+                            steps_per_epoch=SAMPLES_PER_EPOCH, validation_steps=len(X_valid), 
+							max_q_size=1, verbose=1, validation_data=valid)
 
 ####################################################################
 
+save_path = '/Users/mohammedamarnah/Desktop/SDCProject/save/'
 json = model.to_json()
 model.save_weights('./save/model-'+name+'.h5')
-with open('./save/model-'+name+'.json', 'w') as f:
+with open(save_path+'model-'+name+'.json', 'w') as f:
     f.write(json)

@@ -2,16 +2,16 @@ from keras.models import Sequential
 from keras.optimizers import Adam
 from keras.layers import BatchNormalization, Conv2D, ConvLSTM2D, Dense, MaxPooling2D, Dropout, Flatten, Lambda, Convolution2D
 from keras.layers.advanced_activations import ELU
-from keras.regularizers import l2, activity_l2
+# from keras.regularizers import l2, activity_l2
 
 def nvidia(LR=1e-4, inputshape=(64, 64, 1), comp=False, summary=False):
 	model = Sequential()
 	model.add(Lambda(lambda x: x/127.5-1.0, input_shape=inputshape))
-	model.add(Conv2D(24, 5, 5, activation='elu', subsample=(2, 2)))
-	model.add(Conv2D(36, 5, 5, activation='elu', subsample=(2, 2)))
-	model.add(Conv2D(48, 5, 5, activation='elu', subsample=(2, 2)))
-	model.add(Conv2D(64, 3, 3, activation='elu'))
-	model.add(Conv2D(64, 3, 3, activation='elu'))
+	model.add(Conv2D(24, (5, 5), strides=(2, 2), activation='elu'))
+	model.add(Conv2D(36, (5, 5), strides=(2, 2), activation='elu'))
+	model.add(Conv2D(48, (5, 5), strides=(2, 2), activation='elu'))
+	model.add(Conv2D(64, (3, 3), activation='elu'))
+	model.add(Conv2D(64, (3, 3), activation='elu'))
 	model.add(Dropout(0.5))
 	model.add(Flatten())
 	model.add(Dense(100, activation='elu'))

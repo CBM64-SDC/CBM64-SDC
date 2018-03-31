@@ -193,6 +193,10 @@ int main() {
     // Assigns the output image
     cv::Mat out = input;
     
+    // write "out" to a file.
+    // system("python predict.py");
+    // read from a file.
+    
     double timeElapsed = (clock() - time) / CLOCKS_PER_SEC;
     cv::putText(out, to_string(1/timeElapsed) + " FPS", cvPoint(30, 40), 2, 1, cvScalar(0));
     cv::imshow("output", out);

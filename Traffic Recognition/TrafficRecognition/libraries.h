@@ -16,6 +16,8 @@
 #include <queue>
 #include <vector>
 #include <set>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
