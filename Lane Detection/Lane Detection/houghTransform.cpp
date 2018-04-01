@@ -1,4 +1,4 @@
-/*#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <iostream>
@@ -104,4 +104,4 @@ int main( int argc, char** argv ){
     Probabilistic_Hough(0, 0);
     waitKey(0);
     return 0;
-}*/
+}
