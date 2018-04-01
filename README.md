@@ -1,8 +1,21 @@
 # CBM64-SDC
+## The first open source Arabic Self Driving Car.
 
-################################### Datasets ############################################
+### What is this? 
+CBM64 is the first open source arabic self driving car. Currently the car is under development. Working modules are the steering controller, the lane line detector, the vehicle detection system, and the traffic sign recognition system.
+Currently, there is an integrated system that is being developed. Once the integrated system is finished, the system will be tested on a medium-sized RC car.
 
-* Haar Cascade datasets for various objects: https://github.com/opencv/opencv/tree/master/data/haarcascades
+### Project Components:
+* Steering Controller: Deep learning and control Theory.
+* Lane Line Detector: Computer vision and image processing.
+* Vehicle Detection: Computer vision and deep learning.
+* Traffic Sign Recognition: Computer vision and deep learning.
+* Integrated System: Made on QT (C++). An interface to the whole system.
+* Hardware Node: Currently being developed.
 
-* 38K img dataset for track1 - Udacity self driving car simulator: http://www.mediafire.com/file/5icq78dcz9ac1d8/38KImgDataset.zip
+### Datasets Used: 
+* Haar Cascade datasets for various objects: https://goo.gl/NjUdvR
+* 38K img dataset for track1 - Udacity self driving car simulator: https://goo.gl/3Z8oSK
+
+
 
