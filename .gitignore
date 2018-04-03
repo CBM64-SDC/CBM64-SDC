@@ -1,6 +1,7 @@
 .DS_Store
 *.out
 *.in
+*.ipynb
 Lane\ Detection/build
 Lane\ Detection/*.xcodeproj
 Traffic\ Recognition/build
