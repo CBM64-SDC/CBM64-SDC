@@ -1,4 +1,4 @@
-/*#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
@@ -29,8 +29,8 @@ static void CannyThreshold(int, void*){
     
     imshow( window_name, dst );
 }
-*/
-/*int main( int, char** argv ){
+
+int main( int, char** argv ){
     src = imread(argv[1], IMREAD_COLOR); // Load an image
     
     if( src.empty() )
@@ -53,4 +53,4 @@ static void CannyThreshold(int, void*){
     waitKey(0);
     
     return 0;
-}*/
+}

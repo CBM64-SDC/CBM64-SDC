@@ -7,14 +7,15 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-//g++ -std=c++11 source.cpp `pkg-config --libs --cflags opencv` -o source
+//g++ -std=c++11 main.cpp `pkg-config --libs --cflags opencv` -o source
 
 using namespace cv;
 using namespace std;
 
 Mat src, originalImage;
-Mat image, sobeledX, sobeledY, colored, perspectiveTransformed, combined, dirThreshold, magThreshold, hlsed, combinedColor;
-Mat edges, toShow;
+Mat image, sobeledX, sobeledY, colored, perspectiveTransformed;
+Mat combined, dirThreshold, magThreshold, hlsed, combinedColor;
+Mat edges, toShow, contoured;
 
 string window_name = "Edge Detector";
 
@@ -38,6 +39,10 @@ int g_run = 1, g_dontset = 0;
 VideoCapture cap;
 //######### #########
 
+//###########
+RNG rng(12345);
+//###########
+
 void onTrackbarSlide(int pos, void *){
     cap.set(CAP_PROP_POS_FRAMES, pos);
     if(!g_dontset)
@@ -52,72 +57,6 @@ void printPicture(Mat soorah){
         }
         printf("\n");
     }
-
-    //Not working method
-
-    // uint8_t *myData = soorah.data;
-    // int _stride = int(soorah.step);
-    // for(int i=0; i < soorah.rows; ++i){
-    //     for(int j=0; j < soorah.cols; ++j){
-    //         //uint8_t val = myData[i + _stride + j];
-    //         printf("%lf\t", soorah.at<double>(i, j));
-    //     }
-    // }
-}
-
-inline float theta(double r, double g, double b) {
-    return acos((r - (g * 0.1) - (b * 0)) / sqrtf((r * r) + (g * g) + (b * b) - (r * g) - (r * b) - (g * b)));
-}
-
-inline float getHue(double r, double g, double b){
-    return (b <= g) ? (theta(r, g, b) * 255.f / (2.f * M_PI)) : (((2.f * M_PI) - theta(r, g, b)) * 255.f / (2.f * M_PI));
-}
-
-inline float getLum(double r, double g, double b){
-    return (0.210f * r) + (0.715f * g) + (0.072f * b);
-}
-
-inline float getSat(double r, double g, double b){
-    return (max(r, max(g, b)) - min(r, min(g, b)));
-}
-
-//no need
-void HSLColorThreshold(Mat &temp, bool color, uint8_t hueMax, uint8_t hueMin, uint8_t satMin){
-    Mat output;
-    CV_Assert(temp.channels() == 3);
-    output.create(temp.size(), CV_8UC1);
-
-    for(int i=0; i<temp.rows; ++i){
-        const uchar *imgData = temp.ptr<uchar>(i);
-        uchar *outData = output.ptr<uchar>(i);
-        for(int j=0; j<temp.cols; ++j){
-            uchar s = *imgData++;
-            uchar l = *imgData++;
-            uchar h = *imgData++;
-            if(!color)
-                *outData++ = ((h > hueMin && h < hueMax) && s > satMin) ? 255 : 0;
-            else
-                *outData++ = ((h > hueMax || h < hueMax) && s > satMin) ? 255 : 0;
-        }
-    }
-    temp = output;
-}
-
-//no need
-Mat toIHLS(Mat src){
-    Mat temp;
-    //
-    CV_Assert(src.channels() == 3);
-
-    temp = src.clone();
-    for(auto it = temp.begin<Vec3b>(); it != temp.end<Vec3b>(); ++it){
-        Vec3b bgr = (*it);
-        (*it)[0] = getSat(double(bgr[0]), double(bgr[1]), double(bgr[2]));
-        (*it)[1] = getLum(double(bgr[0]), double(bgr[1]), double(bgr[2]));
-        (*it)[2] = getHue(double(bgr[0]), double(bgr[1]), double(bgr[2]));
-    }
-    HSLColorThreshold(temp, 0, 250, 15, 10);
-    return temp;
 }
 
 void standardHough( int, void* ){
@@ -260,34 +199,6 @@ Mat sobelThreshold(Mat src, uint8_t min=100, uint8_t max=200, char type='x', int
     // imshow(window_name, myImage);
     // waitKey(0);
 }
-
-// Mat colorThreshold(Mat src, uint8_t min = 100, uint8_t max = 200) {
-//     cvtColor(src, src, CV_BGR2HLS);
-//     Mat channels[3];
-//     split(src, channels);
-//     Mat srcHLS = channels[1];
-//     vector<vector<uint8_t> > img;
-//     img.resize(srcHLS.rows);
-//     for(int i=0; i<srcHLS.rows; ++i){
-//         vector<uint8_t> temp;
-//         temp.resize(srcHLS.cols);
-//         uint8_t* p = srcHLS.ptr<uint8_t>(i);
-//         for(int j=0; j<srcHLS.cols; ++j){
-//             if(p[j] > min && p[j] <= max)
-//                 temp[j] = 255;
-//             else
-//                 temp[j] = 0;
-//         }
-//         img[i] = temp;
-//     }
-//     Mat resColor((int)img.size(), (int)img[0].size(), CV_8UC1);
-//     for(int i=0; i<resColor.rows; ++i){
-//         for(int j=0; j<resColor.cols; ++j){
-//             resColor.at<uint8_t>(i,j) = img[i][j];
-//         }
-//     }
-//     return resColor;
-// }
 
 Mat perspectiveTransformation(Mat input){
     Mat output;
@@ -438,6 +349,7 @@ Mat HLS(Mat src, uint8_t min=160, uint8_t max=255){
     return output;
 }
 
+// useless
 Mat regionOfInterest(Mat src,const Point* v){
     Mat image = Mat::zeros(src.rows, src.cols, CV_8UC1);
     int ignore = 255;
@@ -460,14 +372,16 @@ Mat combinedColorThresholding(Mat hls, Mat combinedGradient){
                 output.at<uint8_t>(i,j) = 0;
         }
     }
+    //########### SolidWhite.mp4 ################
     Point leftBot(100, output.rows);
-    Point rightBot(output.cols - 20, output.rows);
-    Point innerLeftBot(310, output.rows);
-    Point innerRightBot(1150, output.rows);
-    Point apex1(610, 410);
-    Point apex2(680, 410);
-    Point innerApex1(700, 480);
-    Point innerApex2(650, 480);
+    Point rightBot(1000, output.rows);
+    Point innerLeftBot(1000, output.rows);
+    Point innerRightBot(950, output.rows);
+    Point apex1(470, 300);
+    Point apex2(50, 600);
+    Point innerApex1(750, 1200);
+    Point innerApex2(650, 1200);
+    //############              #################
 
     // Point leftBot(100, output.rows);
     // Point rightBot(output.cols - 20, output.rows);
@@ -498,6 +412,34 @@ Mat combinedColorThresholding(Mat hls, Mat combinedGradient){
     return output;
 }
 
+Mat thresh_callback(Mat src, int, void* , int minThresh=200, int maxThresh=250){
+    Mat canny_output;
+    vector<vector<Point> > contours;
+    vector<Vec4i> hierarchy;
+    Mat src_gray;
+
+    // /// Convert image to gray and blur it
+    // cvtColor( originalImage, src_gray, CV_BGR2GRAY );
+    // blur( src_gray, src_gray, Size(3,3) );
+
+
+    /// Detect edges using canny
+    Canny( src, canny_output, minThresh, minThresh*2, 3 );
+    /// Find contours
+    findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+    /// Draw contours
+    Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+    for( int i = 0; i< contours.size(); i++ ){
+        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+        //drawContours( originalImage, contours, i, color, 2, 8, hierarchy, 0, Point() );
+        drawContours( drawing, contours, i, color, CV_FILLED);
+        //fillPoly(originalImage, contours, contours, 1, Scalar(0,0,0), 8);
+    }
+
+    return canny_output;
+}
+
 int main(int argc, char** argv){
     //src = imread(argv[1]);
     //string path = "/Users/mohammedamarnah/Desktop/SDCProject/CBM64-SDC/Lane Detection/Lane Detection/Samples/";
@@ -505,13 +447,13 @@ int main(int argc, char** argv){
     //VideoCapture cap(path2);
     cap.open(path2);
     namedWindow(window_name, WINDOW_AUTOSIZE);
-    //############
-    // int frames = (int) cap.get(CAP_PROP_FRAME_COUNT);
-    // int tmpw   = (int) cap.get(CAP_PROP_FRAME_WIDTH);
-    // int tmph   = (int) cap.get(CAP_PROP_FRAME_HEIGHT);
-    // cout << "Video has " << frames << " Frames of dimensions(" << tmpw << ", " << tmph << ")." << endl;
-    // createTrackbar("Position", window_name, &g_slider_position, frames, onTrackbarSlide);
-    //############
+    // ############
+    int frames = (int) cap.get(CAP_PROP_FRAME_COUNT);
+    int tmpw   = (int) cap.get(CAP_PROP_FRAME_WIDTH);
+    int tmph   = (int) cap.get(CAP_PROP_FRAME_HEIGHT);
+    cout << "Video has " << frames << " Frames of dimensions(" << tmpw << ", " << tmph << ")." << endl;
+    //createTrackbar("Position", window_name, &g_slider_position, frames, onTrackbarSlide);
+    // ############
 
     
     if(!cap.isOpened()){
@@ -521,7 +463,7 @@ int main(int argc, char** argv){
     while(1){
         double time = clock();
         
-        if(g_run != 0){
+        //if(g_run != 0){
             cap >> src;
             if(src.empty())
                 break;
@@ -539,24 +481,26 @@ int main(int argc, char** argv){
 
             
             //Apply Sobel Threshold
-            //sobeledX = sobelThreshold(originalImage, 100, 200, 'x', 3);
-            //sobeledY = sobelThreshold(originalImage, 100, 200, 'y', 3);
+            sobeledX = sobelThreshold(originalImage, 100, 200, 'x', 3);
+            sobeledY = sobelThreshold(originalImage, 100, 200, 'y', 3);
             
             //Apply Direction Threshold
-            //dirThreshold = directionThreshold(originalImage, 0.65, 1.05);
+            dirThreshold = directionThreshold(originalImage, 0.65, 1.05);
 
             //Apply Magnitude Threshold
-            //magThreshold = magnitudeThreshold(originalImage, 40, 255);
+            magThreshold = magnitudeThreshold(originalImage, 40, 255);
 
             //Apply Combined Thresholding
-            //combined = combinedGradientThresholding(sobeledX, sobeledY, dirThreshold, magThreshold);
+            combined = combinedGradientThresholding(sobeledX, sobeledY, dirThreshold, magThreshold);
 
             //Apply HLS color Threshold
-            //hlsed = HLS(originalImage, 100, 250);
+            hlsed = HLS(originalImage, 100, 250);
 
             //Apply Combined Color Threshold
-            //combinedColor = combinedColorThresholding(hlsed, combined);
-            
+            combinedColor = combinedColorThresholding(hlsed, magThreshold);
+
+            contoured = thresh_callback(combinedColor, 0, 0);
+
             //Perspective Transformation
             //perspectiveTransformed = perspectiveTransformation(edges);
             
@@ -566,16 +510,16 @@ int main(int argc, char** argv){
             //Standard HoughTransform
             //standardHough(0, 0);
 
-            //Test for CTF
-            Mat output(src.rows, src.cols, CV_8UC1);
-            for(int i=0; i<src.rows; ++i){
-                for(int j=0; j<src.cols; ++j){
-                    if(src.at<uint8_t>(i,j) >= 100)
-                        output.at<uint8_t>(i,j) = 255;
-                    else
-                        output.at<uint8_t>(i,j) = 0;
-                }
-            }
+            //For later
+            // Mat output(src.rows, src.cols, CV_8UC1);
+            // for(int i=0; i<src.rows; ++i){
+            //     for(int j=0; j<src.cols; ++j){
+            //         if(src.at<uchar>(i,j) >= 100)
+            //             output.at<uchar>(i,j) = 255;
+            //         else
+            //             output.at<uchar>(i,j) = 0;
+            //     }
+            // }
             
             //flip(src, magThreshold, -1);
             
@@ -596,25 +540,25 @@ int main(int argc, char** argv){
             g_dontset = 1;
             setTrackbarPos("Position", window_name, current_pos);
             //pyrDown(originalImage, src);
-            imshow(window_name, output);
+            imshow(window_name, contoured);
             g_run -= 1;
-        }
+        //}
 
-        char c = (char) waitKey(10);
-        if(c == 's'){
-            g_run = 1;
-            cout << "Single step, run = " << g_run << endl;
-        }
-        if(c == 'r'){
-            g_run = -1;
-            cout << "Run mode, run = " << g_run << endl;
-        }
-        if(c == 27)
-            break;
-        // char c = (char)waitKey(25);
-        // if(c==27)
+        // char c = (char) waitKey(10);
+        // if(c == 's'){
+        //     g_run = 1;
+        //     cout << "Single step, run = " << g_run << endl;
+        // }
+        // if(c == 'r'){
+        //     g_run = -1;
+        //     cout << "Run mode, run = " << g_run << endl;
+        // }
+        // if(c == 27)
         //     break;
-        // else if (c == 32)
-        //     flag = (flag + 1)%3;
+        char c = (char)waitKey(25);
+        if(c==27)
+            break;
+        else if (c == 32)
+            flag = (flag + 1)%3;
     }
 }
