@@ -18,14 +18,14 @@ from keras.models import Sequential
 ###### TRAINING CONSTANTS ######
 SPLIT = 0.7
 BATCH_SIZE = 40
-EPOCHS = 10
+EPOCHS = 30
 SAMPLES_PER_EPOCH = (20000//BATCH_SIZE)*BATCH_SIZE
 IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS = 66, 200, 3
 INPUT_SHAPE = (IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_CHANNELS)
 ############################
 
 # Reading from the clean csv after the path fixing
-# Note that custom collected data is joined with 
+# Note that custom collected data is joined with
 # the udacity data
 path1 = '/Users/mohammedamarnah/Desktop/SDCProject/data/IMG/'
 path2 = '/Users/mohammedamarnah/Desktop/SDCProject/custom-data/IMG/'
@@ -95,7 +95,7 @@ model, name = models.nvidia(LR=1e-4, inputshape=INPUT_SHAPE, comp=True, summary=
 print("Training model: ", name)
 
 history = model.fit_generator(train, epochs=EPOCHS,
-                            steps_per_epoch=SAMPLES_PER_EPOCH, validation_steps=len(X_valid), 
+                            steps_per_epoch=SAMPLES_PER_EPOCH, validation_steps=len(valid),
 							max_q_size=1, verbose=1, validation_data=valid)
 
 ####################################################################
