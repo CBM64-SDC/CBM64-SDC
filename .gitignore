@@ -2,6 +2,7 @@
 *.out
 *.in
 *.ipynb
+*.hdf5
 Lane\ Detection/build
 Lane\ Detection/*.xcodeproj
 Traffic\ Recognition/build
