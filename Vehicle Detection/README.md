@@ -1,7 +1,4 @@
 # Single Shot Multibox Detector (SSD) for Vehicle Detection and Tracking
-## Udacity Self Driving Car Nanodegree - Project 5
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
-
 
 [//]: # (Image References)
 [image1]: ./images/img1.png
@@ -15,16 +12,6 @@
 [image9]: ./out_images/test7_out.jpg
 [image10]: ./out_images/test8_out.jpg
 [image11]: ./out_images/test9_out.jpg
-
-What is this project?
----
-The goals of this project are the following:
-
-* Implement a deep learning architecture for object detection to use on the vehicle detection problem.
-* Understand the SSD architecture for object detection and use it to detect vehicles.
-* Implement a vehicle detection pipeline that could be used in real time.
-* Run the pipeline on a video stream.
-* Estimate a bounding box for the vehicles detected.
 
 SSD | Single Shot MultiBox Detector
 ---
