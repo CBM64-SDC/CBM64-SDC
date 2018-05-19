@@ -1,7 +1,6 @@
 .DS_Store
 *.out
 *.in
-*.ipynb
 *.hdf5
 Lane\ Detection/build
 Lane\ Detection/*.xcodeproj
